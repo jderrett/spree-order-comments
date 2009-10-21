@@ -1,12 +1,10 @@
-Spree Order Comments
+# Spree Order Comments
 
-http://github.com/jderrett/spree-order-comments
-
-An extension for Spree to allow comments on the Order admin view
+An extension for Spree to allow comments on the Order Admin view
 
 Requirements:
 
-* [acts\_as\_commentable](git://github.com/jackdempsey/acts_as_commentable.git) installed
+* [acts\_as\_commentable](http://github.com/jackdempsey/acts_as_commentable) installed
 
 Notes:
 
