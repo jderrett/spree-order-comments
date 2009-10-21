@@ -1,0 +1,102 @@
+<div class='toolbar order-links'>
+  <%= button_link_to t("resend"), resend_admin_order_url(@order), :method => :post, :icon => 'send-email' %>
+  <%= event_links %>
+</div>
+
+<%= render :partial => 'admin/shared/order_tabs', :locals => {:current => "Order Details"} %>
+
+<%= render :partial => 'admin/shared/order_details', :locals => {:order => @order} -%>
+
+<% if @order.bill_address %>
+  <div class='adr'>
+    <h4>
+      <%= link_to t("bill_address"), edit_admin_order_creditcard_payment_url(@order, @order.creditcard_payments.last) if @order.creditcard_payments.present? %>
+      <%= t("bill_address") if @order.creditcard_payments.empty? %>
+    </h4>
+    <%= render :partial => 'admin/shared/address', :locals => {:address => @order.bill_address} %>      
+  </div>
+<% end %>                   
+<% if @order.ship_address %>
+  <div class='adr'>
+    <h4>
+      <%= link_to t("ship_address"), edit_admin_order_shipment_url(@order, @order.shipments.last) if @order.shipments.present? %>
+      <%= t("ship_address") if @order.shipments.empty? %>
+    </h4>
+    <%= render :partial => 'admin/shared/address', :locals => {:address => @order.ship_address} %>      
+  </div>
+  <% end %>
+<hr />
+
+<table class="index">
+  <tr>
+    <th><%= t("email") %></th>
+  </tr>
+  <tr>
+    <td><%= @order.email %></td>
+  </tr>
+</table>
+
+<% unless @order.special_instructions.blank? %>
+  <table class="index">
+    <tr>
+      <th><%= t("shipping_instructions") %></th>
+    </tr>
+    <tr>
+      <td><pre><%= @order.special_instructions %></pre></td>
+    </tr>
+  </table>
+<% end %>
+
+<h4><%= t('add_comment') %></h4>
+<div class="order-add-comment">
+  <% form_tag(comments_path) do %>
+    <%= hidden_field_tag 'comment[commentable_id]', @order.id %>
+    <%= hidden_field_tag 'comment[commentable_type]', @order.class %>
+    <%= hidden_field_tag 'comment[user_id]', current_user.id %>
+    <%= text_area_tag 'comment[comment]', nil, :style => 'width:100%; height:100px;' %>
+    <p class="form-buttons">
+      <%= button t('add_comment') %> 
+    </p>
+  <% end %>
+</div>
+
+<h4><%= t('comments') %></h4>
+
+<ul class="order-comments">
+  <% @order.comments.each_with_index do |comment,index| %>
+    <li id="order-comment-<%= index %>" class="<%= cycle('odd','even') %>">
+      <div id="order-comment-header-<%= index %>" class="order-comment-header">
+        <strong><%= comment.user.email%> said:</strong>
+      </div>
+      <div id="order-comment-body-<%= index %>" class="order-comment-body">
+        <%= comment.comment %>
+      </div>
+      <div id="comment-meta-<%= index %>">
+        on  <em><%= comment.created_at.to_formatted_s(:long)%></em>
+      </div>
+    </li>
+  <% end %>
+</ul>
+
+
+<h4><%= t('history') %></h4>
+
+<table class="index">
+  <tr>
+    <th><%= t("event") %></th>
+    <th><%= t("user") %></th>
+    <th><%= "#{t('spree.date')}/#{t('spree.time')}" %></th>
+  </tr>
+  <% @order.state_events.sort.each do |event| %>
+    <tr>
+      <td><%=t("#{event.name}") %></td>
+      <td><%=event.user.email if event.user %></td>
+      <td><%=event.created_at.to_s(:date_time24) %></td>
+    </tr>
+  <% end %>
+  <% if @order.state_events.empty? %>
+    <tr>
+      <td colspan="3"><%= t("none_available") %></td>
+    </tr>
+  <% end %>
+</table>
